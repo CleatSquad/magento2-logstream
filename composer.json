@@ -4,9 +4,25 @@
     "type": "magento2-module",
     "version": "1.0.0",
     "license": "MIT",
+    "keywords": [
+        "magento2",
+        "logging",
+        "docker",
+        "stdout",
+        "container",
+        "log-aggregation",
+        "monolog",
+        "elk",
+        "devops"
+    ],
+    "support": {
+        "issues": "https://github.com/cleatsquad/magento2-logstream/issues",
+        "source": "https://github.com/cleatsquad/magento2-logstream",
+        "docs": "https://github.com/cleatsquad/magento2-logstream"
+    },
     "require-dev": {
         "phpunit/phpunit": "^9",
-        "friendsofphp/php-cs-fixer": "^2.18"
+        "phpstan/phpstan": "^1.0"
     },
     "require": {
         "php": ">=8.1",
@@ -17,7 +33,8 @@
     "authors": [
         {
             "name": "Mohamed El Mrabet",
-            "homepage": "https://www.cleatsquad.com",
+            "email": "contact@cleatsquad.dev",
+            "homepage": "https://cleatsquad.dev",
             "role": "Developer"
         }
     ],
@@ -28,7 +45,22 @@
         }
     },
     "scripts": {
-        "test": "@php vendor/bin/phpunit",
-        "phpstan": "@php vendor/bin/phpstan analyse"
+        "unit-test": "vendor/bin/phpunit ./src/Test/Unit",
+        "phpstan": "vendor/bin/phpstan analyse ./src/"
+    },
+    "repositories": {
+        "0": {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "magento/composer-dependency-version-audit-plugin": true
+        }
     }
 }
