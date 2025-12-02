@@ -21,6 +21,11 @@ class StdoutHandler extends StreamHandler
      */
     private const GENERAL_SETTINGS_LOGGING_LOG_LEVEL = 'general/logging/log_level';
 
+    /**
+     * Default log level value (INFO = 200)
+     */
+    private const DEFAULT_LOG_LEVEL = 200;
+
     public function __construct(ScopeConfigInterface $scopeConfig, FormatterInterface $formatter)
     {
         $level = $this->getConfigLevel($scopeConfig);
@@ -31,6 +36,9 @@ class StdoutHandler extends StreamHandler
     /**
      * Get the log level from the Magento configuration.
      *
+     * Returns an integer log level value, which is compatible with both
+     * Monolog 2.x and 3.x StreamHandler constructor.
+     *
      * @param ScopeConfigInterface $scopeConfig
      * @return int
      */
@@ -40,6 +48,7 @@ class StdoutHandler extends StreamHandler
             self::GENERAL_SETTINGS_LOGGING_LOG_LEVEL,
             ScopeInterface::SCOPE_WEBSITE
         );
-        return $level ? (int)$level : Logger::INFO;
+
+        return $level ? (int) $level : self::DEFAULT_LOG_LEVEL;
     }
 }
