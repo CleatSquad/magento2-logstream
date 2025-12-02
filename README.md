@@ -7,7 +7,7 @@ A Magento 2 module that redirects all Magento logs to **StdOut**, making it idea
 [![Packagist Downloads](https://img.shields.io/packagist/dm/cleatsquad/magento2-logstream?color=blue)](https://packagist.org/packages/cleatsquad/magento2-logstream/stats)
 [![Packagist Version](https://img.shields.io/packagist/v/cleatsquad/magento2-logstream?color=blue)](https://packagist.org/packages/cleatsquad/magento2-logstream)
 [![Packagist License](https://img.shields.io/packagist/l/cleatsquad/magento2-logstream)](https://github.com/cleatsquad/magento2-logstream/blob/master/LICENSE.md)
-![Magento 2.4.6 and above](https://img.shields.io/badge/Magento-2.4%20and%20above-brightgreen.svg?style=flat)
+![Magento 2.4.6 and above](https://img.shields.io/badge/Magento-2.4.6%20--%202.4.8-brightgreen.svg?style=flat)
 ![PHP 8.1+](https://img.shields.io/badge/PHP-8.1%2B-blue.svg?style=flat)
 
 ---

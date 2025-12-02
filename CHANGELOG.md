@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Added support for Monolog 3.x (required for Magento 2.4.8)
+- Updated `composer.json` to allow `monolog/monolog: ^2.0 || ^3.0`
+- Updated `StdoutHandler` to handle both Monolog 2.x and 3.x log level formats
+- Updated `LogLevel` source model to use Monolog `Level` enum when available (Monolog 3.x)
+- Backward compatible with Magento 2.4.6 and 2.4.7 (Monolog 2.x)
+
 ## [1.0.0] - 2024-01-15
 
 ### Added
