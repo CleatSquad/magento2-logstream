@@ -8,6 +8,7 @@
  */
 namespace CleatSquad\LogStream\Test\Unit\Logger;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Level;
 use Monolog\LogRecord;
@@ -132,5 +133,37 @@ class StdoutHandlerTest extends TestCase
         $handler = $this->createStdoutHandler();
         $record = $this->createLogRecord(400); // ERROR
         $this->assertFalse($handler->isHandling($record));
+    }
+
+    public function testConfiguredLevelRaisesTheThreshold(): void
+    {
+        $scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $scopeConfig->method('getValue')->willReturn('200'); // raise floor to INFO
+
+        $handler = new StdoutHandler(new JsonFormatter(), $scopeConfig);
+
+        $this->assertFalse($handler->isHandling($this->createLogRecord(100))); // DEBUG now excluded
+        $this->assertTrue($handler->isHandling($this->createLogRecord(200))); // INFO still included
+    }
+
+    public function testConfiguredLevelCannotWidenBeyondTheHandlerRange(): void
+    {
+        $scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $scopeConfig->method('getValue')->willReturn('100'); // below the handler's own baseline
+
+        $handler = new StdoutHandler(new JsonFormatter(), $scopeConfig);
+
+        $this->assertTrue($handler->isHandling($this->createLogRecord(100))); // DEBUG still included
+        $this->assertFalse($handler->isHandling($this->createLogRecord(300))); // still capped at INFO
+    }
+
+    public function testScopeConfigFailureFallsBackToTheHandlerBaseline(): void
+    {
+        $scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $scopeConfig->method('getValue')->willThrowException(new \RuntimeException('no DB connection yet'));
+
+        $handler = new StdoutHandler(new JsonFormatter(), $scopeConfig);
+
+        $this->assertTrue($handler->isHandling($this->createLogRecord(100))); // DEBUG still included
     }
 }

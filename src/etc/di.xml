@@ -23,11 +23,13 @@
     <type name="CleatSquad\LogStream\Logger\StdoutHandler">
         <arguments>
             <argument name="formatter" xsi:type="object">CleatSquad\LogStream\Logger\Formatter\ColoredLineFormatter</argument>
+            <argument name="scopeConfig" xsi:type="object">Magento\Framework\App\Config\ScopeConfigInterface</argument>
         </arguments>
     </type>
     <type name="CleatSquad\LogStream\Logger\StderrHandler">
         <arguments>
             <argument name="formatter" xsi:type="object">CleatSquad\LogStream\Logger\Formatter\ColoredLineFormatter</argument>
+            <argument name="scopeConfig" xsi:type="object">Magento\Framework\App\Config\ScopeConfigInterface</argument>
         </arguments>
     </type>
 

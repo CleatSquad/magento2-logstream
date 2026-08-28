@@ -10,12 +10,14 @@ declare(strict_types=1);
 
 namespace CleatSquad\LogStream\Logger;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Monolog\Formatter\FormatterInterface;
 
 /**
  * Class StdoutHandler
  * A handler that writes log messages to stdout.
- * Only handles DEBUG (100) to INFO (200) levels.
+ * Handles DEBUG (100) to INFO (200) levels by default, or a narrower range if
+ * `general/logging/log_level` is configured above 100 in the admin panel.
  */
 class StdoutHandler extends AbstractLevelRangeHandler
 {
@@ -29,8 +31,8 @@ class StdoutHandler extends AbstractLevelRangeHandler
      */
     private const MAX_LEVEL = 200;
 
-    public function __construct(FormatterInterface $formatter)
+    public function __construct(FormatterInterface $formatter, ?ScopeConfigInterface $scopeConfig = null)
     {
-        parent::__construct('php://stdout', self::MIN_LEVEL, self::MAX_LEVEL, $formatter);
+        parent::__construct('php://stdout', self::MIN_LEVEL, self::MAX_LEVEL, $formatter, $scopeConfig);
     }
 }
