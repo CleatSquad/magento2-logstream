@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+- Removed the admin configuration option `general/logging/log_level` (`src/etc/adminhtml/system.xml` and `src/etc/config.xml` deleted). Log routing is now hardcoded: `StdoutHandler` handles DEBUG-INFO and the new `StderrHandler` handles WARNING-EMERGENCY. Any log level previously set via the Magento admin panel is no longer read or applied. To customize formatting or levels, override the handler wiring in your own `app/etc/di.xml`.
+
+### Added
+- `StderrHandler` to route WARNING-EMERGENCY logs to `php://stderr`, separate from `StdoutHandler`
+- `ColoredLineFormatter` for ANSI-colored terminal output with automatic stack traces
+- `JsonStreamFormatter` for structured JSON output compatible with Kubernetes, New Relic, and Datadog
+
 ### Changed
 - Added support for Monolog 3.x (required for Magento 2.4.8)
 - Updated `composer.json` to allow `monolog/monolog: ^2.0 || ^3.0`
