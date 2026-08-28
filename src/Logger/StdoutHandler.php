@@ -11,16 +11,13 @@ declare(strict_types=1);
 namespace CleatSquad\LogStream\Logger;
 
 use Monolog\Formatter\FormatterInterface;
-use Monolog\Handler\StreamHandler;
-use Monolog\Level;
-use Monolog\LogRecord;
 
 /**
  * Class StdoutHandler
  * A handler that writes log messages to stdout.
  * Only handles DEBUG (100) to INFO (200) levels.
  */
-class StdoutHandler extends StreamHandler
+class StdoutHandler extends AbstractLevelRangeHandler
 {
     /**
      * Minimum log level (DEBUG = 100)
@@ -34,26 +31,6 @@ class StdoutHandler extends StreamHandler
 
     public function __construct(FormatterInterface $formatter)
     {
-        parent::__construct("php://stdout", self::MIN_LEVEL, false);
-        $this->setFormatter($formatter);
-    }
-
-    /**
-     * Check if this handler handles the given log record.
-     * Only handles logs between DEBUG (100) and INFO (200).
-     *
-     * @param LogRecord|array $record
-     * @return bool
-     */
-    public function isHandling(LogRecord|array $record): bool
-    {
-        // Get level value - handle both Monolog 2.x (array) and 3.x (LogRecord)
-        if ($record instanceof LogRecord) {
-            $level = $record->level->value;
-        } else {
-            $level = $record['level'] ?? 0;
-        }
-
-        return $level >= self::MIN_LEVEL && $level <= self::MAX_LEVEL;
+        parent::__construct('php://stdout', self::MIN_LEVEL, self::MAX_LEVEL, $formatter);
     }
 }

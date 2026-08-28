@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `JsonStreamFormatter` for structured JSON output compatible with Kubernetes, New Relic, and Datadog
 
 ### Changed
+- Extracted the shared level-range filtering logic of `StdoutHandler` and `StderrHandler` into a common `AbstractLevelRangeHandler` base class
+- Cleaned up the inactive JSON formatter block in `di.xml`
 - Added support for Monolog 3.x (required for Magento 2.4.8)
 - Updated `composer.json` to allow `monolog/monolog: ^2.0 || ^3.0`
 - Updated `StdoutHandler` to handle both Monolog 2.x and 3.x log level formats

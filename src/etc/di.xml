@@ -32,9 +32,8 @@
     </type>
 
     <!--
-    JSON Formatter for Kubernetes/New Relic/Datadog
-    To use JSON formatter instead of colored formatter, uncomment below and comment out the colored formatter config above.
-    Or create app/etc/di.xml in your project with:
+    JSON Formatter for Kubernetes/New Relic/Datadog.
+    To use it instead of the colored formatter, add an app/etc/di.xml in your project with:
 
     <type name="CleatSquad\LogStream\Logger\StdoutHandler">
         <arguments>
@@ -48,7 +47,7 @@
     </type>
     -->
 
-    <!-- Default JSON formatter configuration -->
+    <!-- Default arguments used when JsonStreamFormatter is enabled via the override above -->
     <type name="CleatSquad\LogStream\Logger\Formatter\JsonStreamFormatter">
         <arguments>
             <argument name="serviceName" xsi:type="string">magento</argument>
