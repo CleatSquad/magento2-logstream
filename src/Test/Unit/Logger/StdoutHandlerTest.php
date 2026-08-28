@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2024 Mohamed EL Mrabet
  * CleatSquad - https://cleatsquad.dev
@@ -6,6 +7,7 @@
  * This file is part of the CleatSquad_LogStream module.
  * Licensed under the MIT License. See the LICENSE file in the module root.
  */
+
 namespace CleatSquad\LogStream\Test\Unit\Logger;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -25,11 +27,6 @@ class StdoutHandlerTest extends TestCase
      * Minimum log level (DEBUG = 100)
      */
     private const MIN_LEVEL = 100;
-
-    /**
-     * Maximum log level (INFO = 200)
-     */
-    private const MAX_LEVEL = 200;
 
     private function createStdoutHandler(): StdoutHandler
     {

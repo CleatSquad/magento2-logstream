@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025 Mohamed EL Mrabet
  * CleatSquad - https://cleatsquad.dev
@@ -294,7 +295,7 @@ class JsonStreamFormatter extends JsonFormatter
 
             $file = $frame['file'] ?? 'unknown';
             $line = $frame['line'] ?? 0;
-            $function = $frame['function'] ?? 'unknown';
+            $function = $frame['function'];
 
             if ($class !== '') {
                 $function = $class . ($frame['type'] ?? '::') . $function;

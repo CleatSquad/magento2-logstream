@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2024 Mohamed EL Mrabet
  * CleatSquad - https://cleatsquad.dev

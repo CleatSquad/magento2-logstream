@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025 Mohamed EL Mrabet
  * CleatSquad - https://cleatsquad.dev
@@ -132,7 +133,7 @@ class ColoredLineFormatter extends LineFormatter
                 return true;
             }
         }
-        return isset($context['exception']) && $context['exception'] instanceof \Throwable;
+        return false;
     }
 
     /**
@@ -170,7 +171,7 @@ class ColoredLineFormatter extends LineFormatter
 
             $file = $frame['file'] ?? 'unknown';
             $line = $frame['line'] ?? 0;
-            $function = $frame['function'] ?? 'unknown';
+            $function = $frame['function'];
 
             if ($class !== '') {
                 $function = $class . ($frame['type'] ?? '::') . $function;

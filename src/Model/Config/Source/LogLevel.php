@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2024 Mohamed EL Mrabet
  * CleatSquad - https://cleatsquad.dev
@@ -21,12 +22,12 @@ use Monolog\Logger;
  */
 class LogLevel implements OptionSourceInterface
 {
-   /**
-     * Get log levels.
-     * returns an array of log levels. Each log level is represented as an associative array
-     *
-     * @return Phrase[][]|int[][]
-     */
+    /**
+      * Get log levels.
+      * returns an array of log levels. Each log level is represented as an associative array
+      *
+      * @return Phrase[][]|int[][]
+      */
     public function toOptionArray(): array
     {
         // Monolog 3.x uses Level enum, Monolog 2.x uses integer constants

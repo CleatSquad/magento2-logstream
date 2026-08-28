@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025 Mohamed EL Mrabet
  * CleatSquad - https://cleatsquad.dev
@@ -6,6 +7,7 @@
  * This file is part of the CleatSquad_LogStream module.
  * Licensed under the MIT License. See the LICENSE file in the module root.
  */
+
 namespace CleatSquad\LogStream\Test\Unit\Logger;
 
 use Monolog\Formatter\JsonFormatter;
@@ -24,11 +26,6 @@ class StderrHandlerTest extends TestCase
      * Minimum log level (WARNING = 300)
      */
     private const MIN_LEVEL = 300;
-
-    /**
-     * Maximum log level (EMERGENCY = 600)
-     */
-    private const MAX_LEVEL = 600;
 
     private function createStderrHandler(): StderrHandler
     {

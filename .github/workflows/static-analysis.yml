@@ -6,6 +6,9 @@ on:
   push:
     branches: [master]
 
+permissions:
+  contents: read
+
 jobs:
   setup-deps:
     name: Prepare dependencies
@@ -26,22 +29,17 @@ jobs:
       - name: PHP Version
         run: php -v
 
-      - name: Create Composer auth directory
-        run: mkdir -p "$HOME/.composer"
-
       - name: Create auth.json
         run: |
+          mkdir -p "$HOME/.composer"
           printf '{"http-basic":{"repo.magento.com":{"username":"%s","password":"%s"}}}' \
-            "$MAGENTO_AUTH_USERNAME" "$MAGENTO_AUTH_PASSWORD" > auth.json
+            "$MAGENTO_AUTH_USERNAME" "$MAGENTO_AUTH_PASSWORD" > "$HOME/.composer/auth.json"
         env:
           MAGENTO_AUTH_USERNAME: ${{ secrets.MAGENTO_AUTH_USERNAME }}
           MAGENTO_AUTH_PASSWORD: ${{ secrets.MAGENTO_AUTH_PASSWORD }}
 
       - name: Install dependencies
         run: composer install --no-progress --no-interaction --prefer-dist --ignore-platform-reqs
-
-      - name: Verify installation
-        run: composer show
 
       # Fallback ACT → pas d'upload artifact
       - name: Save vendor locally for ACT
@@ -90,7 +88,7 @@ jobs:
           path: vendor
 
       - name: Run PHPStan
-        run: vendor/bin/phpstan analyse
+        run: vendor/bin/phpstan analyse --no-progress
 
   php-cs-fixer:
     name: PHP-CS-Fixer
@@ -121,4 +119,35 @@ jobs:
           path: vendor
 
       - name: Run PHP-CS-Fixer
-        run: vendor/bin/php-cs-fixer fix --show-progress=none --dry-run
+        run: vendor/bin/php-cs-fixer fix --show-progress=none --dry-run --diff
+
+  unit-tests:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+
+    container:
+      image: mohelmrabet/magento-frankenphp:php8.2-fp1.10.1-dev
+
+    needs: setup-deps
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ACT fallback
+      - name: Load vendor (ACT fallback)
+        if: ${{ env.ACT }}
+        run: |
+          cp -r /tmp/vendor-artifact/vendor vendor
+          cp /tmp/vendor-artifact/composer.lock composer.lock
+
+      # GitHub only
+      - name: Download vendor
+        if: ${{ !env.ACT }}
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit ./src/Test/Unit

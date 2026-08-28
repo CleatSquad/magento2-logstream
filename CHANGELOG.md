@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Restored the admin configuration option `general/logging/log_level` (`src/etc/adminhtml/system.xml` and `src/etc/config.xml`), removed earlier in this release to work around a `setup:install` crash. `ScopeConfigInterface` is now read lazily inside `isHandling()` — never in the constructor — and defensively wrapped in `try/catch`, so it can no longer fail during bootstrap while the DB isn't available yet. The configured value raises the effective minimum severity above each handler's baseline (stdout: DEBUG-INFO, stderr: WARNING-EMERGENCY) but can never widen it beyond that range. Verified against a live Magento 2.4.9 install: `setup:upgrade` and `setup:di:compile` complete without error, and raising the admin threshold correctly filters DEBUG/INFO out of stdout.
+- Fixed the `phpstan` CI job, which was silently broken: it invoked `vendor/bin/phpstan analyse` with no path and no config file, so it would fail immediately with a usage error rather than actually analysing anything. Added `phpstan.neon.dist` (level 5, `paths: [src]`).
+- Fixed the `php-cs-fixer` CI job, which was also broken: `friendsofphp/php-cs-fixer` was never declared as a dev dependency, so `vendor/bin/php-cs-fixer` did not exist. Added it to `require-dev` and a `.php-cs-fixer.dist.php` (`@PSR12`).
+- Fixed a dead `mkdir -p "$HOME/.composer"` step in the CI workflow: `auth.json` was actually written to the job's working directory, not `$HOME/.composer/`, making that step a no-op. `auth.json` is now written to `$HOME/.composer/auth.json`, matching Composer's global auth lookup and keeping credentials out of the checked-out workspace.
+- Fixed `ColoredLineFormatter::hasException()`: a redundant `$context['exception'] instanceof \Throwable` check after a loop that already inspects every value of `$context` (including `'exception'`) — dead code that PHPStan (level 5) flagged as always `false`. Simplified to just the loop.
+- Removed unused `MAX_LEVEL` test constants in `StdoutHandlerTest`/`StderrHandlerTest`, left over from the `AbstractLevelRangeHandler` extraction.
+- Simplified two `$frame['function'] ?? 'unknown'` fallbacks in the stack-trace generators (`ColoredLineFormatter`, `JsonStreamFormatter`): `debug_backtrace()`'s `'function'` key is never absent, so the fallback was unreachable.
+
+### Added (CI)
+- Added a `PHPUnit` CI job. Unit tests existed for every class in this module but were never actually run in CI — only PHPStan and PHP-CS-Fixer were wired up.
 
 ### Added
 - `StderrHandler` to route WARNING-EMERGENCY logs to `php://stderr`, separate from `StdoutHandler`
