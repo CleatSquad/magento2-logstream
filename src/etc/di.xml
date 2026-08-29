@@ -1,16 +1,60 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * Copyright (c) 2024 Mohamed EL Mrabet
+ * CleatSquad - https://cleatsquad.dev
+ *
+ * This file is part of the CleatSquad_LogStream module.
+ * Licensed under the MIT License. See the LICENSE file in the module root.
+ */
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
    <type name="Magento\Framework\Logger\Monolog">
         <arguments>
             <argument name="handlers"  xsi:type="array">
                 <item name="stdout" xsi:type="object">CleatSquad\LogStream\Logger\StdoutHandler</item>
+                <item name="stderr" xsi:type="object">CleatSquad\LogStream\Logger\StderrHandler</item>
             </argument>
         </arguments>
     </type>
+
+    <!-- Default configuration: Colored formatter for terminal output -->
     <type name="CleatSquad\LogStream\Logger\StdoutHandler">
         <arguments>
-            <argument name="formatter" xsi:type="object">Monolog\Formatter\LineFormatter</argument>
+            <argument name="formatter" xsi:type="object">CleatSquad\LogStream\Logger\Formatter\ColoredLineFormatter</argument>
+            <argument name="scopeConfig" xsi:type="object">Magento\Framework\App\Config\ScopeConfigInterface</argument>
+        </arguments>
+    </type>
+    <type name="CleatSquad\LogStream\Logger\StderrHandler">
+        <arguments>
+            <argument name="formatter" xsi:type="object">CleatSquad\LogStream\Logger\Formatter\ColoredLineFormatter</argument>
+            <argument name="scopeConfig" xsi:type="object">Magento\Framework\App\Config\ScopeConfigInterface</argument>
+        </arguments>
+    </type>
+
+    <!--
+    JSON Formatter for Kubernetes/New Relic/Datadog.
+    To use it instead of the colored formatter, add an app/etc/di.xml in your project with:
+
+    <type name="CleatSquad\LogStream\Logger\StdoutHandler">
+        <arguments>
+            <argument name="formatter" xsi:type="object">CleatSquad\LogStream\Logger\Formatter\JsonStreamFormatter</argument>
+        </arguments>
+    </type>
+    <type name="CleatSquad\LogStream\Logger\StderrHandler">
+        <arguments>
+            <argument name="formatter" xsi:type="object">CleatSquad\LogStream\Logger\Formatter\JsonStreamFormatter</argument>
+        </arguments>
+    </type>
+    -->
+
+    <!-- Default arguments used when JsonStreamFormatter is enabled via the override above -->
+    <type name="CleatSquad\LogStream\Logger\Formatter\JsonStreamFormatter">
+        <arguments>
+            <argument name="serviceName" xsi:type="string">magento</argument>
+            <argument name="environment" xsi:type="string">production</argument>
+            <argument name="includeStackTrace" xsi:type="boolean">true</argument>
         </arguments>
     </type>
 </config>

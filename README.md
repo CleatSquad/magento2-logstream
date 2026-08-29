@@ -1,26 +1,27 @@
 # CleatSquad Magento 2 LogStream
 
-A Magento 2 module that redirects all Magento logs to **StdOut**, making it ideal for **Docker** and **containerized environments**. This enables seamless log aggregation into external systems (ELK, Datadog, CloudWatch, etc.) without managing Magento-specific log files.
+A Magento 2 module that redirects all Magento logs to **StdOut/StdErr**, making it ideal for **Docker** and **containerized environments**. This enables seamless log aggregation into external systems (ELK, Datadog, CloudWatch, etc.) without managing Magento-specific log files.
 
 ## Badges
 
 [![Packagist Downloads](https://img.shields.io/packagist/dm/cleatsquad/magento2-logstream?color=blue)](https://packagist.org/packages/cleatsquad/magento2-logstream/stats)
 [![Packagist Version](https://img.shields.io/packagist/v/cleatsquad/magento2-logstream?color=blue)](https://packagist.org/packages/cleatsquad/magento2-logstream)
 [![Packagist License](https://img.shields.io/packagist/l/cleatsquad/magento2-logstream)](https://github.com/cleatsquad/magento2-logstream/blob/master/LICENSE.md)
-![Magento 2.4.6 and above](https://img.shields.io/badge/Magento-2.4%20and%20above-brightgreen.svg?style=flat)
+![Magento 2.4.6 and above](https://img.shields.io/badge/Magento-2.4.6%20--%202.4.8-brightgreen.svg?style=flat)
 ![PHP 8.1+](https://img.shields.io/badge/PHP-8.1%2B-blue.svg?style=flat)
 
 ---
 
 ## ✨ Features
 
-- 🐳 **Docker-ready**: Logs to StdOut for seamless container integration.
+- 🐳 **Docker-ready**: Logs to StdOut/StdErr for seamless container integration.
 - 📊 **External Log Aggregation**: Works with ELK, Datadog, CloudWatch, Splunk, etc.
-- ⚙️ **Configurable Log Levels**: Set log level (DEBUG, INFO, WARNING, ERROR, etc.) from admin panel.
+- 🔀 **Stdout/Stderr Split**: DEBUG-INFO goes to `php://stdout`, WARNING-EMERGENCY goes to `php://stderr` — matching how log collectors and `docker logs` typically separate output.
+- 🎨 **Colored or JSON Output**: Ships with a colored terminal formatter by default, and a structured JSON formatter for Kubernetes/New Relic/Datadog, selectable via `di.xml`.
 - 🛡️ **Clean DI Override**: Uses Magento dependency injection, no core hacks.
 - 🎯 **Zero Configuration**: Works out of the box after installation.
 - 🔄 **Real-time Logs**: Immediate log output without file I/O delays.
-- 🧩 **Monolog Integration**: Built on Monolog's StreamHandler.
+- 🧩 **Monolog 2.x & 3.x Integration**: Built on Monolog's StreamHandler, compatible with both major versions.
 
 ---
 
@@ -81,28 +82,60 @@ docker logs -f <container_name>
 
 ## ⚙️ Configuration
 
-To configure the log level for the CleatSquad Magento2 LogStream module, follow these steps in the Magento admin interface:
+Log routing is split by severity between two streams, matching how log collectors and
+`docker logs` typically separate output:
 
-### Setting the Log Level
+| Level | Value | Default Stream |
+|-------|-------|--------|
+| DEBUG | 100 | `php://stdout` |
+| INFO | 200 | `php://stdout` |
+| NOTICE | 250 | `php://stderr` |
+| WARNING | 300 | `php://stderr` |
+| ERROR | 400 | `php://stderr` |
+| CRITICAL | 500 | `php://stderr` |
+| ALERT | 550 | `php://stderr` |
+| EMERGENCY | 600 | `php://stderr` |
 
-1. Navigate to `Stores > Configuration` in the admin panel sidebar.
-2. Under the `General` section, find and open the `Logging` group.
-3. Select the desired log level from the `Log Level` dropdown menu.
+### Setting a Minimum Log Level
 
-### Available Log Levels
+`Stores > Configuration > General > Logging > Minimum Log Level` lets you raise the
+severity threshold above each stream's own baseline — e.g. set it to `WARNING` to silence
+`DEBUG`/`INFO` on stdout entirely, or to `ERROR` to also drop `WARNING`/`NOTICE` from stderr.
+It cannot lower the threshold below a stream's own range: stdout will never emit
+`WARNING`-and-above, and stderr will never emit below `WARNING`, regardless of this setting.
+The default (`DEBUG`) logs everything, matching the zero-configuration behavior described
+above. Changes take effect immediately, no cache flush required.
 
-| Level | Value | Description |
-|-------|-------|-------------|
-| DEBUG | 100 | Detailed debug information |
-| INFO | 200 | Interesting events (default) |
-| NOTICE | 250 | Normal but significant events |
-| WARNING | 300 | Exceptional occurrences that are not errors |
-| ERROR | 400 | Runtime errors |
-| CRITICAL | 500 | Critical conditions |
-| ALERT | 550 | Action must be taken immediately |
-| EMERGENCY | 600 | System is unusable |
+### Choosing a Formatter
 
-Changes will take effect immediately after saving the configuration.
+The module ships with two formatters, wired in the module's own `etc/di.xml`:
+
+- **`ColoredLineFormatter`** (default): human-readable, ANSI-colored single-line output for
+  local development and plain-text log viewers. Automatically appends a stack trace to
+  WARNING-and-above entries that don't already carry an exception.
+- **`JsonStreamFormatter`**: structured JSON output with fields pre-mapped for Kubernetes,
+  New Relic, and Datadog (`service`, `environment`, `severity`, `trace_id`, `kubernetes.*`, etc.).
+
+To switch to the JSON formatter, add an `app/etc/di.xml` in your project:
+
+```xml
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="CleatSquad\LogStream\Logger\StdoutHandler">
+        <arguments>
+            <argument name="formatter" xsi:type="object">CleatSquad\LogStream\Logger\Formatter\JsonStreamFormatter</argument>
+        </arguments>
+    </type>
+    <type name="CleatSquad\LogStream\Logger\StderrHandler">
+        <arguments>
+            <argument name="formatter" xsi:type="object">CleatSquad\LogStream\Logger\Formatter\JsonStreamFormatter</argument>
+        </arguments>
+    </type>
+</config>
+```
+
+`JsonStreamFormatter` accepts `serviceName`, `environment`, and `includeStackTrace` constructor
+arguments (see `src/etc/di.xml` for the defaults) — override them the same way if needed.
 
 ---
 
@@ -112,9 +145,17 @@ Changes will take effect immediately after saving the configuration.
 
 This module works by:
 
-1. **Overriding Monolog's handler**: Adds a custom `StdoutHandler` to Magento's logger via DI.
-2. **Streaming to php://stdout**: All log messages are written directly to standard output.
-3. **Respecting log levels**: Only logs at or above the configured level are output.
+1. **Overriding Monolog's handlers**: Registers `StdoutHandler` and `StderrHandler` on
+   Magento's logger via DI, replacing the default file handler.
+2. **Splitting by severity**: `StdoutHandler` only handles DEBUG-INFO, `StderrHandler` only
+   handles WARNING-EMERGENCY — each checks the record's level against its own range, and
+   against the admin-configured minimum level, in `isHandling()`.
+3. **Reading configuration lazily**: the admin log level is read from `ScopeConfigInterface`
+   only when a record is being handled, never in the constructor, and any failure falls back
+   to the handler's baseline range — this keeps `bin/magento setup:install` safe, since the
+   handler is built before the database connection exists.
+4. **Streaming directly**: All log messages are written straight to `php://stdout` /
+   `php://stderr`, with no intermediate log file.
 
 ### DI Configuration
 
@@ -123,6 +164,7 @@ This module works by:
     <arguments>
         <argument name="handlers" xsi:type="array">
             <item name="stdout" xsi:type="object">CleatSquad\LogStream\Logger\StdoutHandler</item>
+            <item name="stderr" xsi:type="object">CleatSquad\LogStream\Logger\StderrHandler</item>
         </argument>
     </arguments>
 </type>

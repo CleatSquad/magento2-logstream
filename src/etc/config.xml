@@ -1,10 +1,19 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * Copyright (c) 2024 Mohamed EL Mrabet
+ * CleatSquad - https://cleatsquad.dev
+ *
+ * This file is part of the CleatSquad_LogStream module.
+ * Licensed under the MIT License. See the LICENSE file in the module root.
+ */
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <general>
             <logging>
-                <log_level>300</log_level>
+                <log_level>100</log_level>
             </logging>
         </general>
     </default>

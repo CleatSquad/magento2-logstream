@@ -1,0 +1,14 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    ignoreErrors:
+        -
+            # Monolog's PHPStan stubs narrow StreamHandler::__construct()'s $level param to a
+            # literal int/string union derived from the Level enum. Our MIN_LEVEL/MAX_LEVEL
+            # constants (100/200/300/600) are always one of these values at runtime — verified
+            # against a live Monolog 3.10 install — but PHPStan can't prove it statically from a
+            # plain `int` parameter. This is a stub strictness gap, not a real bug.
+            message: '#Parameter \#2 \$level of method Monolog\\Handler\\StreamHandler::__construct\(\) expects#'
+            path: src/Logger/AbstractLevelRangeHandler.php
+            identifier: argument.type

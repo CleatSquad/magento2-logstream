@@ -1,0 +1,64 @@
+---
+name: Code style and static analysis
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+
+    # TON IMAGE UTILISÉE COMME ENVIRONNEMENT
+    container:
+      image: mohelmrabet/magento-frankenphp:php8.2-fp1.10.1-dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run PHPStan
+        uses: mohaelmrabet/magento-php-qa-action@v1
+        with:
+          command: phpstan
+          composer-auth: ${{ secrets.COMPOSER_AUTH }}
+
+  php-cs-fixer:
+    name: PHP-CS-Fixer
+    runs-on: ubuntu-latest
+
+    container:
+      image: mohelmrabet/magento-frankenphp:php8.2-fp1.10.1-dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run PHP-CS-Fixer
+        uses: mohaelmrabet/magento-php-qa-action@v1
+        with:
+          command: cs-fixer
+          composer-auth: ${{ secrets.COMPOSER_AUTH }}
+
+  unit-tests:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+
+    container:
+      image: mohelmrabet/magento-frankenphp:php8.2-fp1.10.1-dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run PHPUnit
+        uses: mohaelmrabet/magento-php-qa-action@v1
+        with:
+          command: phpunit
+          composer-auth: ${{ secrets.COMPOSER_AUTH }}
+          phpunit-path: ./src/Test/Unit
