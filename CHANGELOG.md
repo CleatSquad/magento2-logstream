@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-29
+
 ### Fixed
 - Restored the admin configuration option `general/logging/log_level` (`src/etc/adminhtml/system.xml` and `src/etc/config.xml`), removed earlier in this release to work around a `setup:install` crash. `ScopeConfigInterface` is now read lazily inside `isHandling()` — never in the constructor — and defensively wrapped in `try/catch`, so it can no longer fail during bootstrap while the DB isn't available yet. The configured value raises the effective minimum severity above each handler's baseline (stdout: DEBUG-INFO, stderr: WARNING-EMERGENCY) but can never widen it beyond that range. Verified against a live Magento 2.4.9 install: `setup:upgrade` and `setup:di:compile` complete without error, and raising the admin threshold correctly filters DEBUG/INFO out of stdout.
 - Fixed the `phpstan` CI job, which was silently broken: it invoked `vendor/bin/phpstan analyse` with no path and no config file, so it would fail immediately with a usage error rather than actually analysing anything. Added `phpstan.neon.dist` (level 5, `paths: [src]`).
@@ -17,13 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed unused `MAX_LEVEL` test constants in `StdoutHandlerTest`/`StderrHandlerTest`, left over from the `AbstractLevelRangeHandler` extraction.
 - Simplified two `$frame['function'] ?? 'unknown'` fallbacks in the stack-trace generators (`ColoredLineFormatter`, `JsonStreamFormatter`): `debug_backtrace()`'s `'function'` key is never absent, so the fallback was unreachable.
 
-### Added (CI)
-- Added a `PHPUnit` CI job. Unit tests existed for every class in this module but were never actually run in CI — only PHPStan and PHP-CS-Fixer were wired up.
-
 ### Added
 - `StderrHandler` to route WARNING-EMERGENCY logs to `php://stderr`, separate from `StdoutHandler`
 - `ColoredLineFormatter` for ANSI-colored terminal output with automatic stack traces
 - `JsonStreamFormatter` for structured JSON output compatible with Kubernetes, New Relic, and Datadog
+- Added a `PHPUnit` CI job. Unit tests existed for every class in this module but were never actually run in CI — only PHPStan and PHP-CS-Fixer were wired up.
 
 ### Changed
 - Extracted the shared level-range filtering logic of `StdoutHandler` and `StderrHandler` into a common `AbstractLevelRangeHandler` base class
@@ -57,5 +57,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/cleatsquad/magento2-logstream/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/cleatsquad/magento2-logstream/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/cleatsquad/magento2-logstream/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/cleatsquad/magento2-logstream/releases/tag/v1.0.0
