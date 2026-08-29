@@ -31,15 +31,16 @@ jobs:
 
       - name: Create auth.json
         run: |
-          mkdir -p "$HOME/.composer"
+          composer_home="${COMPOSER_HOME:-$HOME/.composer}"
+          mkdir -p "$composer_home"
           printf '{"http-basic":{"repo.magento.com":{"username":"%s","password":"%s"}}}' \
-            "$MAGENTO_AUTH_USERNAME" "$MAGENTO_AUTH_PASSWORD" > "$HOME/.composer/auth.json"
+            "$MAGENTO_AUTH_USERNAME" "$MAGENTO_AUTH_PASSWORD" > "$composer_home/auth.json"
         env:
           MAGENTO_AUTH_USERNAME: ${{ secrets.MAGENTO_AUTH_USERNAME }}
           MAGENTO_AUTH_PASSWORD: ${{ secrets.MAGENTO_AUTH_PASSWORD }}
 
       - name: Install dependencies
-        run: composer install --no-progress --no-interaction --prefer-dist --ignore-platform-reqs
+        run: composer install --no-progress --no-interaction --prefer-dist
 
       # Fallback ACT → pas d'upload artifact
       - name: Save vendor locally for ACT
