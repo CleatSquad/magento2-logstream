@@ -2,7 +2,7 @@
     "name": "cleatsquad/magento2-logstream",
     "description": "A Magento 2 module to redirect all logs to StdOut, ideal for dockerized environments.",
     "type": "magento2-module",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "license": "MIT",
     "keywords": [
         "magento2",
