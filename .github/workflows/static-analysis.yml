@@ -22,13 +22,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: composer install --no-progress --no-interaction --prefer-dist
-        env:
-          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
-
       - name: Run PHPStan
-        run: vendor/bin/phpstan analyse --no-progress
+        uses: mohaelmrabet/magento-php-qa-action@v1
+        with:
+          command: phpstan
+          composer-auth: ${{ secrets.COMPOSER_AUTH }}
 
   php-cs-fixer:
     name: PHP-CS-Fixer
@@ -41,13 +39,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: composer install --no-progress --no-interaction --prefer-dist
-        env:
-          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
-
       - name: Run PHP-CS-Fixer
-        run: vendor/bin/php-cs-fixer fix --show-progress=none --dry-run --diff
+        uses: mohaelmrabet/magento-php-qa-action@v1
+        with:
+          command: cs-fixer
+          composer-auth: ${{ secrets.COMPOSER_AUTH }}
 
   unit-tests:
     name: PHPUnit
@@ -60,10 +56,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: composer install --no-progress --no-interaction --prefer-dist
-        env:
-          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
-
       - name: Run PHPUnit
-        run: vendor/bin/phpunit ./src/Test/Unit
+        uses: mohaelmrabet/magento-php-qa-action@v1
+        with:
+          command: phpunit
+          composer-auth: ${{ secrets.COMPOSER_AUTH }}
+          phpunit-path: ./src/Test/Unit
