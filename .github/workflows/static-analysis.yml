@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run PHPStan
-        uses: mohaelmrabet/magento-php-qa-action@main
+        uses: mohaelmrabet/magento-php-qa-action@v1
         with:
           command: phpstan
           composer-auth: ${{ secrets.COMPOSER_AUTH }}
@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run PHP-CS-Fixer
-        uses: mohaelmrabet/magento-php-qa-action@main
+        uses: mohaelmrabet/magento-php-qa-action@v1
         with:
           command: cs-fixer
           composer-auth: ${{ secrets.COMPOSER_AUTH }}
@@ -57,7 +57,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run PHPUnit
-        uses: mohaelmrabet/magento-php-qa-action@main
+        uses: mohaelmrabet/magento-php-qa-action@v1
         with:
           command: phpunit
           composer-auth: ${{ secrets.COMPOSER_AUTH }}
