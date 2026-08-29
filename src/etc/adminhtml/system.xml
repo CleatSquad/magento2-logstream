@@ -1,4 +1,13 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * Copyright (c) 2024 Mohamed EL Mrabet
+ * CleatSquad - https://cleatsquad.dev
+ *
+ * This file is part of the CleatSquad_LogStream module.
+ * Licensed under the MIT License. See the LICENSE file in the module root.
+ */
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/system_file.xsd">
     <system>
@@ -7,7 +16,8 @@
                    showInStore="0" >
                 <label>Logging</label>
                 <field id="log_level" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Log Level</label>
+                    <label>Minimum Log Level</label>
+                    <comment>Raises the minimum severity logged to stdout/stderr. Cannot lower it below each stream's own range (stdout: DEBUG-INFO, stderr: WARNING-EMERGENCY).</comment>
                     <source_model>CleatSquad\LogStream\Model\Config\Source\LogLevel</source_model>
                 </field>
             </group>

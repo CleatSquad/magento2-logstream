@@ -1,0 +1,69 @@
+---
+name: Code style and static analysis
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+
+    # TON IMAGE UTILISÉE COMME ENVIRONNEMENT
+    container:
+      image: mohelmrabet/magento-frankenphp:php8.2-fp1.10.1-dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist
+        env:
+          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse --no-progress
+
+  php-cs-fixer:
+    name: PHP-CS-Fixer
+    runs-on: ubuntu-latest
+
+    container:
+      image: mohelmrabet/magento-frankenphp:php8.2-fp1.10.1-dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist
+        env:
+          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+
+      - name: Run PHP-CS-Fixer
+        run: vendor/bin/php-cs-fixer fix --show-progress=none --dry-run --diff
+
+  unit-tests:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+
+    container:
+      image: mohelmrabet/magento-frankenphp:php8.2-fp1.10.1-dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist
+        env:
+          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit ./src/Test/Unit

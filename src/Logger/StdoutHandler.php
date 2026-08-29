@@ -1,45 +1,39 @@
 <?php
 
+/**
+ * Copyright (c) 2024 Mohamed EL Mrabet
+ * CleatSquad - https://cleatsquad.dev
+ *
+ * This file is part of the CleatSquad_LogStream module.
+ * Licensed under the MIT License. See the LICENSE file in the module root.
+ */
 declare(strict_types=1);
 
 namespace CleatSquad\LogStream\Logger;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\ScopeInterface;
 use Monolog\Formatter\FormatterInterface;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 
 /**
  * Class StdoutHandler
  * A handler that writes log messages to stdout.
+ * Handles DEBUG (100) to INFO (200) levels by default, or a narrower range if
+ * `general/logging/log_level` is configured above 100 in the admin panel.
  */
-class StdoutHandler extends StreamHandler
+class StdoutHandler extends AbstractLevelRangeHandler
 {
     /**
-     * The path to the log level setting in the Magento configuration.
+     * Minimum log level (DEBUG = 100)
      */
-    private const GENERAL_SETTINGS_LOGGING_LOG_LEVEL = 'general/logging/log_level';
-
-    public function __construct(ScopeConfigInterface $scopeConfig, FormatterInterface $formatter)
-    {
-        $level = $this->getConfigLevel($scopeConfig);
-        parent::__construct("php://stdout", $level, false);
-        $this->setFormatter($formatter);
-    }
+    private const MIN_LEVEL = 100;
 
     /**
-     * Get the log level from the Magento configuration.
-     *
-     * @param ScopeConfigInterface $scopeConfig
-     * @return int
+     * Maximum log level (INFO = 200)
      */
-    private function getConfigLevel(ScopeConfigInterface $scopeConfig): int
+    private const MAX_LEVEL = 200;
+
+    public function __construct(FormatterInterface $formatter, ?ScopeConfigInterface $scopeConfig = null)
     {
-        $level = $scopeConfig->getValue(
-            self::GENERAL_SETTINGS_LOGGING_LOG_LEVEL,
-            ScopeInterface::SCOPE_WEBSITE
-        );
-        return $level ? (int)$level : Logger::INFO;
+        parent::__construct('php://stdout', self::MIN_LEVEL, self::MAX_LEVEL, $formatter, $scopeConfig);
     }
 }
